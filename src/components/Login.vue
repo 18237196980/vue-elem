@@ -2,13 +2,42 @@
   <div class="login-container">
     <div class="login-box">
       <div class="login-img"><img src="../assets/image/logo.png" /></div>
+      <el-form class="el-form" ref="form" :rules="rules" :model="form">
+        <el-form-item prop="name"><el-input placeholder="请输入用户名" prefix-icon="test t-iconicon-test" v-model="form.name"></el-input></el-form-item>
+        <el-form-item prop="pwd"><el-input placeholder="请输入密码" type="password" prefix-icon="test t-iconmima" v-model="form.pwd"></el-input></el-form-item>
+        <el-form-item class="btns">
+          <el-button type="primary" @click="onSubmit">登陆</el-button>
+          <el-button type="info" @click="onReset">重置</el-button>
+        </el-form-item>
+      </el-form>
     </div>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'Login'
+  name: 'Login',
+  data () {
+    return {
+      form: {
+        name: '',
+        pwd: ''
+      },
+      rules: {
+        name: [{ required: true, message: '请输入用户名', trigger: 'blur' }, { min: 3, max: 5, message: '长度在3到6个字符', trigger: 'blur' }],
+        pwd: [{ required: true, message: '请输入密码', trigger: 'blur' }, { min: 3, max: 5, message: '长度在3到6个字符', trigger: 'blur' }]
+      }
+
+    }
+  },
+  methods: {
+    onSubmit () {
+      console.log('submit!')
+    },
+    onReset () {
+      console.log('reset')
+    }
+  }
 }
 </script>
 
@@ -43,5 +72,16 @@ export default {
   height: 100%;
   border-radius: 50%;
   background-color: #eee;
+}
+.btns{
+  display: flex;
+  justify-content: flex-end;
+}
+.el-form {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  padding: 0 20px;
+  box-sizing: border-box;
 }
 </style>
