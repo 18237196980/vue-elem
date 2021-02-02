@@ -5,6 +5,10 @@ import './plugins/element.js'
 import './assets/css/global.css'
 import './assets/css/font/iconfont.css'
 
+import axios from 'axios'
+axios.defaults.baseURL = 'http://127.0.0.1:9876'
+Vue.prototype.$http = axios
+
 Vue.config.productionTip = false
 
 new Vue({
