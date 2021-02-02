@@ -17,7 +17,7 @@
 <script>
 export default {
   name: 'Login',
-  data () {
+  data() {
     return {
       form: {
         username: 'jack',
@@ -27,35 +27,34 @@ export default {
         username: [{ required: true, message: '请输入用户名', trigger: 'blur' }, { min: 3, max: 10, message: '长度在3到10个字符', trigger: 'blur' }],
         password: [{ required: true, message: '请输入密码', trigger: 'blur' }, { min: 3, max: 10, message: '长度在3到10个字符', trigger: 'blur' }]
       }
-
-    }
+    };
   },
   methods: {
-    onSubmit () {
-      const that = this
-      that.$refs.form.validate(async (valid) => {
+    onSubmit() {
+      const that = this;
+      that.$refs.form.validate(async valid => {
         if (!valid) {
-          that.$message.error('登录失败')
+          that.$message.error('登录失败');
         } else {
-          const res = await that.$http.post('/ele/login', that.form)
-          const data = res.data
+          const res = await that.$http.post('/ele/login', that.form);
+          const data = res.data;
           if (data.code === 1) {
-            window.localStorage.setItem('id', data.data.id)
-            window.localStorage.setItem('name', data.data.name)
-            window.localStorage.setItem('token', data.data.token)
+            window.localStorage.setItem('id', data.data.id);
+            window.localStorage.setItem('name', data.data.name);
+            window.localStorage.setItem('token', data.data.token);
 
             // 跳转到主页
-            this.$router.push('/home')
+            this.$router.push('/home');
           } else {
           }
         }
-      })
+      });
     },
-    onReset () {
-      this.$refs.form.resetFields()
+    onReset() {
+      this.$refs.form.resetFields();
     }
   }
-}
+};
 </script>
 
 <style scoped>
@@ -90,7 +89,7 @@ export default {
   border-radius: 50%;
   background-color: #eee;
 }
-.btns{
+.btns {
   display: flex;
   justify-content: flex-end;
 }
