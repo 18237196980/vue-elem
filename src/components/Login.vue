@@ -3,8 +3,8 @@
     <div class="login-box">
       <div class="login-img"><img src="../assets/image/logo.png" /></div>
       <el-form class="el-form" ref="form" :rules="rules" :model="form">
-        <el-form-item prop="name"><el-input placeholder="请输入用户名" prefix-icon="test t-iconicon-test" v-model="form.name"></el-input></el-form-item>
-        <el-form-item prop="pwd"><el-input placeholder="请输入密码" type="password" prefix-icon="test t-iconmima" v-model="form.pwd"></el-input></el-form-item>
+        <el-form-item prop="username"><el-input placeholder="请输入用户名" prefix-icon="test t-iconicon-test" v-model="form.username"></el-input></el-form-item>
+        <el-form-item prop="password"><el-input placeholder="请输入密码" type="password" prefix-icon="test t-iconmima" v-model="form.password"></el-input></el-form-item>
         <el-form-item class="btns">
           <el-button type="primary" @click="onSubmit">登陆</el-button>
           <el-button type="info" @click="onReset">重置</el-button>
@@ -17,28 +17,44 @@
 <script>
 export default {
   name: 'Login',
-  data () {
+  data() {
     return {
       form: {
-        name: '',
-        pwd: ''
+        username: 'jack',
+        password: '1234'
       },
       rules: {
-        name: [{ required: true, message: '请输入用户名', trigger: 'blur' }, { min: 3, max: 5, message: '长度在3到6个字符', trigger: 'blur' }],
-        pwd: [{ required: true, message: '请输入密码', trigger: 'blur' }, { min: 3, max: 5, message: '长度在3到6个字符', trigger: 'blur' }]
+        username: [{ required: true, message: '请输入用户名', trigger: 'blur' }, { min: 3, max: 10, message: '长度在3到10个字符', trigger: 'blur' }],
+        password: [{ required: true, message: '请输入密码', trigger: 'blur' }, { min: 3, max: 10, message: '长度在3到10个字符', trigger: 'blur' }]
       }
-
-    }
+    };
   },
   methods: {
-    onSubmit () {
-      console.log('submit!')
+    onSubmit() {
+      const that = this;
+      that.$refs.form.validate(async valid => {
+        if (!valid) {
+          that.$message.error('登录失败');
+        } else {
+          const res = await that.$http.post('/ele/login', that.form);
+          const data = res.data;
+          if (data.code === 1) {
+            window.localStorage.setItem('id', data.data.id);
+            window.localStorage.setItem('name', data.data.name);
+            window.localStorage.setItem('token', data.data.token);
+
+            // 跳转到主页
+            this.$router.push('/home');
+          } else {
+          }
+        }
+      });
     },
-    onReset () {
-      console.log('reset')
+    onReset() {
+      this.$refs.form.resetFields();
     }
   }
-}
+};
 </script>
 
 <style scoped>
@@ -73,7 +89,7 @@ export default {
   border-radius: 50%;
   background-color: #eee;
 }
-.btns{
+.btns {
   display: flex;
   justify-content: flex-end;
 }
