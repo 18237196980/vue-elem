@@ -19,7 +19,12 @@
         <el-table-column prop="cnname" label="中文用户名"></el-table-column>
         <el-table-column prop="mobile" label="手机"></el-table-column>
         <el-table-column prop="email" label="邮箱"></el-table-column>
-        <el-table-column prop="enable_flag" label="是否启用"></el-table-column>
+        <el-table-column prop="enable_flag" label="是否启用">
+          <template slot-scope="scope">
+            <el-tag v-if="scope.row.enable_flag === 1" type="success">启用</el-tag>
+            <el-tag v-if="scope.row.enable_flag === 0" type="danger">未启用</el-tag>
+          </template>
+        </el-table-column>
 
         <el-table-column label="操作">
           <template slot-scope="scope">
