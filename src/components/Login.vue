@@ -20,7 +20,7 @@ export default {
   data() {
     return {
       form: {
-        username: 'jack',
+        username: 'admin',
         password: '1234'
       },
       rules: {
