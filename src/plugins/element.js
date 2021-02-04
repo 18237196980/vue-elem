@@ -5,6 +5,7 @@ import {
   FormItem,
   Input,
   Message,
+  MessageBox,
   Container,
   Header,
   Main,
@@ -21,7 +22,11 @@ import {
   Col,
   Table,
   TableColumn,
-  Tag
+  Tag,
+  Pagination,
+  Dialog,
+  Switch,
+  Confirm
 } from 'element-ui'
 
 Vue.use(Button)
@@ -52,4 +57,9 @@ Vue.use(TableColumn)
 
 Vue.use(Tag)
 
+Vue.use(Pagination)
+Vue.use(Dialog)
+Vue.use(Switch)
+
 Vue.prototype.$message = Message
+Vue.prototype.$confirm = MessageBox.confirm
