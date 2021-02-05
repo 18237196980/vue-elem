@@ -43,9 +43,12 @@ export default {
             window.localStorage.setItem('name', data.data.name);
             window.localStorage.setItem('token', data.data.token);
 
+            window.localStorage.setItem('activePath',''); // 登陆成功后，清除缓存中活跃菜单
+
             // 跳转到主页
             this.$router.push('/home');
           } else {
+            that.$message.error('登录失败');
           }
         }
       });
