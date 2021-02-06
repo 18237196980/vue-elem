@@ -31,6 +31,7 @@
           <template slot-scope="scope">
             <el-button size="mini" @click="handleEdit(scope.row)">编辑</el-button>
             <el-button size="mini" type="danger" @click="handleDelete(scope.row)">删除</el-button>
+            <el-button size="mini" type="success" @click="assignRole(scope.row)">分配角色</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -45,7 +46,7 @@
         :total="total"
       ></el-pagination>
     </el-card>
-    <!-- 弹窗 -->
+    <!-- 弹窗 添加、编辑用户 -->
     <el-dialog :title="title" :visible.sync="dialogVisible" width="30%" :before-close="handleClose">
       <!-- 表单 -->
       <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
@@ -60,10 +61,26 @@
         </el-form-item>
       </el-form>
     </el-dialog>
+    <!-- 弹窗 分配角色 -->
+    <el-dialog :title="title" :visible.sync="roleVisible" width="20%" :before-close="handleCloseRole">
+      <div>
+        <p>用户名称：{{ userInfo.cnname }}</p>
+        <p>角色名称：{{ userInfo.roleName }}</p>
+        <p>
+          角色名称：
+          <el-select v-model="role_id" placeholder="请选择"><el-option v-for="item in roleList" :key="item.id" :label="item.name" :value="item.id"></el-option></el-select>
+        </p>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="selectRoleClose">取 消</el-button>
+          <el-button type="primary" @click="confirmRole">确 定</el-button>
+        </span>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
+import api from '@/api/index.js';
 export default {
   data() {
     // 校验手机号格式
@@ -88,6 +105,10 @@ export default {
       cnname: '',
       dialogVisible: false,
       disabled: false,
+      roleVisible: false,
+      userInfo: {},
+      roleList: [],
+      role_id: '',
 
       ruleForm: {
         name: '',
@@ -107,6 +128,39 @@ export default {
     this.initUsers();
   },
   methods: {
+    selectRoleClose() {
+      this.handleCloseRole();
+    },
+    async confirmRole() {
+      var param = {
+        u_id: this.userInfo.id,
+        role_id: this.role_id
+      };
+      const res = await api.assignRoleForUser(param);
+      const data = res.data;
+      if (data.code === 1) {
+        this.initUsers();
+        this.handleCloseRole();
+      } else {
+        this.$message.error(data.message);
+      }
+    },
+    handleCloseRole() {
+      this.roleVisible = false;
+      this.role_id = '';
+    },
+    async assignRole(userInfo) {
+      const res = await api.allRoles({});
+      const data = res.data;
+      if (data.code === 1) {
+        this.roleList = data.data;
+      } else {
+        this.$message.warning(data.message);
+      }
+      this.title = '分配角色';
+      this.userInfo = userInfo;
+      this.roleVisible = true;
+    },
     add() {
       this.viewType = 0;
       this.disabled = false;

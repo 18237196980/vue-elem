@@ -11,11 +11,12 @@ import './assets/css/font/iconfont.css'
 
 import axios from 'axios'
 
-axios.defaults.baseURL = 'http://127.0.0.1:9876'
+axios.defaults.baseURL = 'http://localhost:9876'
 // 请求预处理
 axios.interceptors.request.use(config => {
   showLoading()
   config.headers.token = window.localStorage.getItem('token')
+  config.headers.uid = window.localStorage.getItem('id')
   return config
 })
 // 响应预处理

@@ -54,17 +54,27 @@
     <!-- 分配权限 -->
     <el-dialog title="分配权限" :visible.sync="dialogVisible" width="25%" :before-close="handleClose">
       <!-- 树形结构 -->
-      <el-tree :data="TreeData" :check-strictly="true" :default-checked-keys="checkKeys" :default-expand-all="true" show-checkbox node-key="id" :props="defaultProps"></el-tree>
+      <el-tree
+        ref="permTree"
+        :data="TreeData"
+        :check-strictly="true"
+        :default-checked-keys="checkKeys"
+        :default-expand-all="true"
+        show-checkbox
+        node-key="id"
+        :props="defaultProps"
+      ></el-tree>
       <!-- 树形结构 -->
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+        <el-button type="primary" @click="confirm">确 定</el-button>
       </span>
     </el-dialog>
   </div>
 </template>
 
 <script>
+import api from '@/api/index.js';
 export default {
   data() {
     return {
@@ -79,14 +89,32 @@ export default {
         children: 'children',
         label: 'name'
       },
-      checkKeys: []
+      checkKeys: [],
+      role_id: ''
     };
   },
   created() {
     this.initRoles();
   },
   methods: {
+    async confirm() {
+      const arr = [...this.$refs.permTree.getCheckedKeys()];
+      console.log(this.role_id);
+      let res = await api.givePerms({ role_id: this.role_id, ids: arr });
+      let data = res.data;
+      if (data.code === 1) {
+        this.$message({
+          message: data.data,
+          type: 'success'
+        });
+        this.initRoles();
+        this.handleClose();
+      } else {
+        this.$message.error(data.message);
+      }
+    },
     async givePerms(role) {
+      this.role_id = role.id;
       this.checkKeys = [];
       let perms = role.perms;
       // 准备默认勾选节点(父子不级联勾选)
@@ -96,7 +124,6 @@ export default {
         if (menu1.children.length > 0) {
           for (let j = 0; j < menu1.children.length; j++) {
             let menu2 = menu1.children[j];
-            console.log('menu2:' + JSON.stringify(menu2));
             this.checkKeys.push(menu2.id);
             if (menu2.children.length > 0) {
               for (let k = 0; k < menu2.children.length; k++) {
@@ -107,6 +134,8 @@ export default {
           }
         }
       }
+
+      console.log(JSON.stringify(this.checkKeys));
 
       this.dialogVisible = true;
       const res = await this.$http.get('/ele/treePrems', {});

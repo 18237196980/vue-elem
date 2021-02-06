@@ -5,7 +5,11 @@
         <div class="header-img"><img src="../assets/image/w-ma.png" /></div>
         <div class="header-title">电商管理系统</div>
       </div>
-      <div class="header-right"><el-button @click="logout" type="info">退出</el-button></div>
+
+      <div class="header-right">
+        <div class="username">欢迎：{{ username }}</div>
+        <el-button @click="logout" type="info">退出</el-button>
+      </div>
     </el-header>
     <el-container>
       <el-aside :width="collapse_flag ? '64px' : '201px'">
@@ -46,18 +50,30 @@ export default {
     return {
       menuList: [],
       collapse_flag: false,
-      activePath: ''
+      activePath: '',
+      username: ''
     };
   },
   created() {
     this.initMenus();
     this.activePath = window.localStorage.getItem('activePath');
+    this.username = window.localStorage.getItem('name');
   },
   methods: {
     // 退出登陆
     logout() {
-      window.localStorage.clear();
-      this.$router.push('/login');
+      let that = this;
+      that
+        .$confirm('确定退出登录吗?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        })
+        .then(() => {
+          window.localStorage.clear();
+          that.$router.push('/login');
+        })
+        .catch(() => {});
     },
     async initMenus() {
       const res = await this.$http.post('/ele/menus');
@@ -70,7 +86,7 @@ export default {
       this.collapse_flag = !this.collapse_flag;
     },
     changeAcive(path) {
-      console.log(path)
+      console.log(path);
       this.activePath = path;
       window.localStorage.setItem('activePath', path);
     }
@@ -117,5 +133,16 @@ export default {
   color: #ffffff;
   font-size: 10px;
   letter-spacing: 0.4em;
+  cursor: pointer;
+}
+.header-right {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.username {
+  color: #ffffff;
+  font-weight: 600;
+  margin-right: 30px;
 }
 </style>
