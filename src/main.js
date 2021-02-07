@@ -8,8 +8,9 @@ import {
 } from './plugins/loading.js'
 import './assets/css/global.css'
 import './assets/css/font/iconfont.css'
-
+import TreeTable from 'vue-table-with-tree-grid'
 import axios from 'axios'
+
 
 axios.defaults.baseURL = 'http://localhost:9876'
 // 请求预处理
@@ -37,6 +38,7 @@ axios.interceptors.response.use(response => {
 Vue.prototype.$http = axios
 
 Vue.config.productionTip = false
+Vue.component('tree-table', TreeTable)
 
 new Vue({
   router,
