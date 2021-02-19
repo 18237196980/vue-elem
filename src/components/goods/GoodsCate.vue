@@ -22,7 +22,7 @@
           <el-tag size="small" v-else-if="scope.row.enable_flag === 1" type="success">启用</el-tag>
           <el-tag size="small" v-else>未知</el-tag>
         </template>
-        <template slot="opt">
+        <template slot="opt" scope="scope">
           <el-button size="mini" type="primary" icon="el-icon-edit" @click="handleEdit(scope.row)">编辑</el-button>
           <el-button size="mini" type="danger" icon="el-icon-delete" @click="handlDel(scope.row)">删除</el-button>
         </template>
@@ -34,12 +34,9 @@
       <!-- 表单 -->
       <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
         <el-form-item label="分类名称" prop="name"><el-input v-model="ruleForm.name"></el-input></el-form-item>
-        <el-form-item label="上级分类" prop="pid">
-          <el-cascader
-              v-model="value"
-              :options="options"
-              :props="{ expandTrigger: 'hover' }"
-              @change="handleChange"></el-cascader>
+        <el-form-item label="上级分类"><el-cascader v-model="ids" :options="GoodsParentCateList" :props="props" @change="handleChange"></el-cascader></el-form-item>
+        <el-form-item v-if="viewType == 2" label="是否启用" prop="enable_flag">
+          <el-switch v-model="ruleForm.enable_flag" active-color="#13ce66" inactive-color="#CFD1D4"></el-switch>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="confirm">确定</el-button>
@@ -55,15 +52,27 @@ import api from '@/api/index.js';
 export default {
   data() {
     return {
-      title: '添加商品分类',
-      dialogVisible:false,
+      viewType: '',
       GoodsCateList: [],
-      ruleForm: {
-        name: '',
+      ids: [], // 添加时，商品分类id集合
+      GoodsParentCateList: [], // 父级商品分类
+      props: {
+        expandTrigger: 'hover',
+        value: 'id',
+        label: 'name',
+        children: 'children',
+        checkStrictly: true
+      },
 
+      title: '添加商品分类',
+      dialogVisible: false,
+      ruleForm: {
+        id: '',
+        name: '',
+        enable_flag: false
       },
       rules: {
-        name: [{ required: true, message: '请输入分类名称', trigger: 'blur' }, {}],
+        name: [{ required: true, message: '请输入分类名称', trigger: 'blur' }, {}]
       },
       columns: [
         {
@@ -86,8 +95,7 @@ export default {
           label: '操作',
           type: 'template',
           template: 'opt'
-        },
-        
+        }
       ]
     };
   },
@@ -95,32 +103,73 @@ export default {
     this.initGoodsCateList();
   },
   methods: {
-    add(){
-      this.dialogVisible=true;
+    handleChange(value) {},
+    add() {
+      this.initGoodsParentCateList();
+      this.viewType = 1;
+      this.dialogVisible = true;
     },
     cancel() {
       this.dialogVisible = false;
       this.$refs['ruleForm'].resetFields();
+      this.ids = [];
     },
     handleClose() {
       this.cancel();
     },
-    handleEdit(row){
+    async handleEdit(row) {
+      this.initGoodsParentCateList();
+      this.viewType = 2;
+      this.dialogVisible = true;
+      this.title = '编辑';
 
+      const res = await api.getGoodsCate({ id: row.id });
+      const data = res.data;
+      if (data.code === 1) {
+        this.ruleForm.id = row.id;
+        this.ruleForm.name = data.data.name;
+        this.ruleForm.enable_flag = data.data.enable_flag == 1 ? true : false;
+        this.ids = data.data.ids;
+      } else {
+        this.$message.error(data.message);
+      }
     },
-    handlDel(row){
-
+    handlDel(row) {
+      let that = this;
+      that
+        .$confirm('确定删除分类【' + row.name + '】吗?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        })
+        .then(async () => {
+          let res = await api.delGoodsCate({ id: row.id });
+          let data = res.data;
+          if (data.code === 1) {
+            that.$message({
+              message: data.data,
+              type: 'success'
+            });
+            that.initGoodsCateList();
+            that.cancel();
+          } else {
+            that.$message.error(data.message);
+          }
+        })
+        .catch(() => {});
     },
     confirm() {
       this.$refs['ruleForm'].validate(async valid => {
         if (valid) {
-          /* this.ruleForm.enable_flag = this.ruleForm.enable_flag ? 1 : 0;
+          this.ruleForm.pid = this.ids.length == 2 ? this.ids[1] : this.ids[0];
+          this.ruleForm.enable_flag = this.ruleForm.enable_flag ? 1 : 0;
           let res;
-          if (!this.viewType === 1) {
+          if (this.viewType === 1) {
             // 添加
-            res = await this.$http.post('/ele/user/add', this.ruleForm);
+            res = await api.addGoodsCate(this.ruleForm);
           } else {
-            res = await this.$http.post('/ele/user/edit', this.ruleForm);
+            // 编辑
+            res = await api.editGoodsCate(this.ruleForm);
           }
           let data = res.data;
           if (data.code === 1) {
@@ -128,11 +177,11 @@ export default {
               message: data.data,
               type: 'success'
             });
-            this.initUsers();
+            this.initGoodsCateList();
             this.cancel();
           } else {
             this.$message.error(data.message);
-          } */
+          }
         } else {
           return false;
         }
@@ -141,11 +190,19 @@ export default {
     async initGoodsCateList() {
       const res = await api.goodsCateLevel({});
       const data = res.data;
-      console.log(JSON.stringify(data));
       if (data.code === 1) {
         this.GoodsCateList = data.data;
       } else {
         this.$message.error('加载商品分类失败');
+      }
+    },
+    async initGoodsParentCateList() {
+      const res = await api.goodsCateLevel({ type: 2 });
+      const data = res.data;
+      if (data.code === 1) {
+        this.GoodsParentCateList = data.data;
+      } else {
+        this.$message.error('加载父级商品分类失败');
       }
     }
   }

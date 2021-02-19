@@ -50,7 +50,7 @@
     <el-dialog :title="title" :visible.sync="dialogVisible" width="30%" :before-close="handleClose">
       <!-- 表单 -->
       <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
-        <el-form-item label="活动名称" prop="name"><el-input v-model="ruleForm.name" :disabled="disabled"></el-input></el-form-item>
+        <el-form-item label="用户名" prop="name"><el-input v-model="ruleForm.name" :disabled="disabled"></el-input></el-form-item>
         <el-form-item label="中文用户名" prop="cnname"><el-input v-model="ruleForm.cnname"></el-input></el-form-item>
         <el-form-item label="手机" prop="mobile"><el-input v-model="ruleForm.mobile"></el-input></el-form-item>
         <el-form-item label="邮箱" prop="email"><el-input v-model="ruleForm.email"></el-input></el-form-item>

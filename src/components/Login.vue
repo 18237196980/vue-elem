@@ -48,7 +48,7 @@ export default {
             // 跳转到主页
             this.$router.push('/home');
           } else {
-            that.$message.error('登录失败');
+            that.$message.error(data.message);
           }
         }
       });

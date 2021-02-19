@@ -10,11 +10,14 @@ import './assets/css/global.css'
 import './assets/css/font/iconfont.css'
 import TreeTable from 'vue-table-with-tree-grid'
 import axios from 'axios'
-
+//导入
+import NProgress from 'nprogress'
+import 'nprogress/nprogress.css'
 
 axios.defaults.baseURL = 'http://localhost:9876'
 // 请求预处理
 axios.interceptors.request.use(config => {
+  NProgress.start()
   showLoading()
   config.headers.token = window.localStorage.getItem('token')
   config.headers.uid = window.localStorage.getItem('id')
@@ -22,6 +25,7 @@ axios.interceptors.request.use(config => {
 })
 // 响应预处理
 axios.interceptors.response.use(response => {
+  NProgress.done()
   setTimeout(() => {
     hideLoading();
   }, 100)
