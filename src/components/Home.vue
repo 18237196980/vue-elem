@@ -3,7 +3,7 @@
     <el-header class="header-div">
       <div class="header-left">
         <div class="header-img"><img src="../assets/image/w-ma.png" /></div>
-        <div class="header-title">电商管理系统</div>
+        <div class="header-title">dsfsddsf</div>
       </div>
 
       <div class="header-right">

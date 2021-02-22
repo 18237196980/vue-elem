@@ -14,7 +14,7 @@ import axios from 'axios'
 import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
 
-axios.defaults.baseURL = 'http://localhost:9876'
+axios.defaults.baseURL = 'http://39.99.161.198:9876'
 // 请求预处理
 axios.interceptors.request.use(config => {
   NProgress.start()

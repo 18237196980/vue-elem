@@ -1,6 +1,8 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Login from '../components/Login.vue'
+// 路由懒加载
+const Login = () => import( /* webpackChunkName: "login" */ '../components/Login.vue')
+
 import Home from '../components/Home.vue'
 import Welcome from '../components/Welcome.vue'
 import User from '../components/user/User.vue'
